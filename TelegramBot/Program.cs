@@ -36,6 +36,21 @@ class Program
                     }
                     );
             }
+            else if (data[0] == "/inline_buttons" && data.Length == 3)
+            {
+                var n = int.Parse(data[1]);
+                var m = int.Parse(data[2]);
+                var buttons = GetInlineButtons(n, m);
+                var charId = update.Message.Chat.Id;
+                var text = update.Message.Text;
+                var messageId = update.Message.MessageId;
+                await client.SendTextMessageAsync(
+                    chatId: charId,
+                    text: text,
+                    replyMarkup: new InlineKeyboardMarkup(buttons)
+                    
+                    );
+            }
             
         }
     }
@@ -50,6 +65,26 @@ class Program
             for (int j = 0; j < m; ++j)
             {
                 row.Add(new KeyboardButton(number.ToString()));
+                number++;
+            }
+            buttons.Add(row);
+        }
+        return buttons;
+    }
+
+    private static List<List<InlineKeyboardButton>> GetInlineButtons(int n, int m)
+    {
+        var buttons = new List<List<InlineKeyboardButton>>();
+        var number = 1;
+        for (int i = 0; i < n; ++i)
+        {
+            var row = new List<InlineKeyboardButton>();
+            for (int j = 0; j < m; ++j)
+            {
+                row.Add(new InlineKeyboardButton(number.ToString())
+                {
+                    CallbackData = number.ToString()
+                });
                 number++;
             }
             buttons.Add(row);
