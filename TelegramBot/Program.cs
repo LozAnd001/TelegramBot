@@ -1,4 +1,5 @@
-﻿using Telegram.Bot;
+﻿using System;
+using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.ReplyMarkups;
 
@@ -18,16 +19,16 @@ class Program
         if (update.Message?.Text != null)
         {
             var data = update.Message.Text.Split();
+            var chatId = update.Message.Chat.Id;
             if (data[0] == "/buttons" && data.Length == 3)
             {
                 var n = int.Parse(data[1]);
                 var m = int.Parse(data[2]);
                 var buttons = GetReplyButtons(n, m);
-                var charId = update.Message.Chat.Id;
                 var text = update.Message.Text;
                 var messageId = update.Message.MessageId;
                 await client.SendTextMessageAsync(
-                    chatId: charId,
+                    chatId: chatId,
                     text: text,
                     replyMarkup: new ReplyKeyboardMarkup(buttons)
                     {
@@ -41,15 +42,47 @@ class Program
                 var n = int.Parse(data[1]);
                 var m = int.Parse(data[2]);
                 var buttons = GetInlineButtons(n, m);
-                var charId = update.Message.Chat.Id;
                 var text = update.Message.Text;
                 var messageId = update.Message.MessageId;
                 await client.SendTextMessageAsync(
-                    chatId: charId,
+                    chatId: chatId,
                     text: text,
                     replyMarkup: new InlineKeyboardMarkup(buttons)
                     
                     );
+            }
+            else if (data[0] == "/photo")
+            {
+                if(data.Length == 2)
+                {
+                    var url = data[1];
+                    await client.SendPhotoAsync(
+                        chatId: chatId,
+                        photo: InputFile.FromUri(url),
+                        caption: "Вот ваша фотка"
+
+                        );
+                }
+                else
+                {
+                    var imagesNames = new string[]
+                    {
+                        "im1.jpg",
+                        "im2.jpg",
+                        "im3.jpg",
+                        "im4.jpg",
+                    };
+                    var random = new Random();
+                    var imageIndex = random.Next(imagesNames.Length);
+                    using (var file = new FileStream($@"images\{imagesNames[imageIndex]}", FileMode.Open, FileAccess.Read) )
+                        await client.SendPhotoAsync(
+                            chatId: chatId,
+                            photo: InputFile.FromStream(file),
+                            caption: imagesNames[imageIndex]
+
+                            );
+
+                }
             }
             
         }
