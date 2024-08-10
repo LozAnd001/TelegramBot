@@ -1,38 +1,65 @@
-﻿using System;
-using Telegram.Bot;
+﻿using Telegram.Bot;
 using Telegram.Bot.Types;
-
+using Telegram.Bot.Types.ReplyMarkups;
 
 class Program
 {
     static async Task Main(string[] args)
     {
-        var telegramBotClient = new TelegramBotClient("7443678080:AAE7igiOsuAUUYX4ud0-cTAeZbcIvCyMhEg");
+        var telegramBotClient = new TelegramBotClient("7325936984:AAHkxwlIXZ9v6qJP0CbRgF4KNRp2CBYRubg");
         var user = await telegramBotClient.GetMeAsync();
-        telegramBotClient.StartReceiving(updateHandler: HandleUpdate, pollingErrorHandler: HandlePoolingError);
         Console.WriteLine($"Начали слушать апдейты с {user.Username}");
+        telegramBotClient.StartReceiving(updateHandler: HandleUpdate, pollingErrorHandler: HandlePoolingError);
         Console.ReadLine();
     }
+
     private static async Task HandleUpdate(ITelegramBotClient client, Update update, CancellationToken token)
     {
-        if(update.Message?.Text != null)
+        if (update.Message?.Text != null)
         {
-            var chatId = update.Message.Chat.Id;
-            var text = update.Message.Text;
-            var messageId = update.Message.MessageId;
-            await client.SendTextMessageAsync(chatId: chatId, $"Вы прислали: \n {text}");
-            await client.SendTextMessageAsync(
-                chatId: chatId, 
-                $"Вы прислали: \n {text}",
-                replyToMessageId: messageId);
+            var data = update.Message.Text.Split();
+            if (data[0] == "/buttons" && data.Length == 3)
+            {
+                var n = int.Parse(data[1]);
+                var m = int.Parse(data[2]);
+                var buttons = GetReplyButtons(n, m);
+                var charId = update.Message.Chat.Id;
+                var text = update.Message.Text;
+                var messageId = update.Message.MessageId;
+                await client.SendTextMessageAsync(
+                    chatId: charId,
+                    text: text,
+                    replyMarkup: new ReplyKeyboardMarkup(buttons)
+                    {
+                        ResizeKeyboard = true,
+
+                    }
+                    );
+            }
+            
         }
     }
-    private static async Task HandlePoolingError(ITelegramBotClient client, Exception exception, CancellationToken token)
+
+    private static List<List<KeyboardButton>> GetReplyButtons(int n, int m)
     {
-        
-        Console.WriteLine(exception.Message);
+        var buttons = new List<List<KeyboardButton>>();
+        var number = 1;
+        for (int i = 0; i < n; ++i)
+        {
+            var row = new List<KeyboardButton>();
+            for (int j = 0; j < m; ++j)
+            {
+                row.Add(new KeyboardButton(number.ToString()));
+                number++;
+            }
+            buttons.Add(row);
+        }
+        return buttons;
     }
 
-    
-}
+    private static async Task HandlePoolingError(ITelegramBotClient client, Exception exception, CancellationToken token)
+    {
 
+        Console.WriteLine(exception.Message);
+    }
+}
