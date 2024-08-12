@@ -2,9 +2,13 @@
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.ReplyMarkups;
+using TelegramBot.Storage;
+using TelegramBot.User;
+using TelegramBot.User.Pages;
 
 class Program
 {
+    static UserStateStorage storage = new UserStateStorage();
     static async Task Main(string[] args)
     {
         var telegramBotClient = new TelegramBotClient("7325936984:AAHkxwlIXZ9v6qJP0CbRgF4KNRp2CBYRubg");
@@ -16,76 +20,32 @@ class Program
 
     private static async Task HandleUpdate(ITelegramBotClient client, Update update, CancellationToken token)
     {
-        if (update.Message?.Text != null)
+        if (update.Message?.Text == null)
         {
-            var data = update.Message.Text.Split();
-            var chatId = update.Message.Chat.Id;
-            if (data[0] == "/buttons" && data.Length == 3)
-            {
-                var n = int.Parse(data[1]);
-                var m = int.Parse(data[2]);
-                var buttons = GetReplyButtons(n, m);
-                var text = update.Message.Text;
-                var messageId = update.Message.MessageId;
-                await client.SendTextMessageAsync(
-                    chatId: chatId,
-                    text: text,
-                    replyMarkup: new ReplyKeyboardMarkup(buttons)
-                    {
-                        ResizeKeyboard = true,
-
-                    }
-                    );
-            }
-            else if (data[0] == "/inline_buttons" && data.Length == 3)
-            {
-                var n = int.Parse(data[1]);
-                var m = int.Parse(data[2]);
-                var buttons = GetInlineButtons(n, m);
-                var text = update.Message.Text;
-                var messageId = update.Message.MessageId;
-                await client.SendTextMessageAsync(
-                    chatId: chatId,
-                    text: text,
-                    replyMarkup: new InlineKeyboardMarkup(buttons)
-                    
-                    );
-            }
-            else if (data[0] == "/photo")
-            {
-                if(data.Length == 2)
-                {
-                    var url = data[1];
-                    await client.SendPhotoAsync(
-                        chatId: chatId,
-                        photo: InputFile.FromUri(url),
-                        caption: "Вот ваша фотка"
-
-                        );
-                }
-                else
-                {
-                    var imagesNames = new string[]
-                    {
-                        "im1.jpg",
-                        "im2.jpg",
-                        "im3.jpg",
-                        "im4.jpg",
-                    };
-                    var random = new Random();
-                    var imageIndex = random.Next(imagesNames.Length);
-                    using (var file = new FileStream($@"images\{imagesNames[imageIndex]}", FileMode.Open, FileAccess.Read) )
-                        await client.SendPhotoAsync(
-                            chatId: chatId,
-                            photo: InputFile.FromStream(file),
-                            caption: imagesNames[imageIndex]
-
-                            );
-
-                }
-            }
-            
+            return;
         }
+        var telegramUserId = update.Message.From.Id;
+        Console.WriteLine($"update_id = {update.Id}, telegramUserId = {telegramUserId}");
+        var isExistUserState = storage.TryGet(telegramUserId, out var userState);
+        if(!isExistUserState)
+        {
+            userState = new UserState(new NotStatePage(), new UserData()); 
+        }
+        Console.WriteLine($"update_id = {update.Id}, telegramUserId = {userState}");
+        var result = userState!.Page.View(update, userState);
+
+        var data = update.Message.Text.Split();
+        var chatId = update.Message.Chat.Id;
+
+        await client.SendTextMessageAsync(
+            chatId: telegramUserId,
+            text: result.Text,
+            replyMarkup: result.ReplyMarkup);
+        storage.AddOrUpdate(telegramUserId, result.UpdateUserState);
+            
+        
+            
+        
     }
 
     private static List<List<KeyboardButton>> GetReplyButtons(int n, int m)
