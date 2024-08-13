@@ -24,6 +24,7 @@ class Program
         {
             return;
         }
+        
         var telegramUserId = update.Message.From.Id;
         Console.WriteLine($"update_id = {update.Id}, telegramUserId = {telegramUserId}");
         var isExistUserState = storage.TryGet(telegramUserId, out var userState);
@@ -31,11 +32,10 @@ class Program
         {
             userState = new UserState(new NotStatePage(), new UserData()); 
         }
-        Console.WriteLine($"update_id = {update.Id}, telegramUserId = {userState}");
-        var result = userState!.Page.View(update, userState);
+        Console.WriteLine($"update_id = {update.Id}, current_userState = {userState}");
+        var result = userState!.Page.Handle(update, userState);
+        Console.WriteLine($"update_id = {update.Id}, send_text = {result.Text}, updated_UserState = {result.UpdateUserState}");
 
-        var data = update.Message.Text.Split();
-        var chatId = update.Message.Chat.Id;
 
         await client.SendTextMessageAsync(
             chatId: telegramUserId,
@@ -46,43 +46,6 @@ class Program
         
             
         
-    }
-
-    private static List<List<KeyboardButton>> GetReplyButtons(int n, int m)
-    {
-        var buttons = new List<List<KeyboardButton>>();
-        var number = 1;
-        for (int i = 0; i < n; ++i)
-        {
-            var row = new List<KeyboardButton>();
-            for (int j = 0; j < m; ++j)
-            {
-                row.Add(new KeyboardButton(number.ToString()));
-                number++;
-            }
-            buttons.Add(row);
-        }
-        return buttons;
-    }
-
-    private static List<List<InlineKeyboardButton>> GetInlineButtons(int n, int m)
-    {
-        var buttons = new List<List<InlineKeyboardButton>>();
-        var number = 1;
-        for (int i = 0; i < n; ++i)
-        {
-            var row = new List<InlineKeyboardButton>();
-            for (int j = 0; j < m; ++j)
-            {
-                row.Add(new InlineKeyboardButton(number.ToString())
-                {
-                    CallbackData = number.ToString()
-                });
-                number++;
-            }
-            buttons.Add(row);
-        }
-        return buttons;
     }
 
     private static async Task HandlePoolingError(ITelegramBotClient client, Exception exception, CancellationToken token)
