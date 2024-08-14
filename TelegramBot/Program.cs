@@ -36,16 +36,24 @@ class Program
         var result = userState!.Page.Handle(update, userState);
         Console.WriteLine($"update_id = {update.Id}, send_text = {result.Text}, updated_UserState = {result.UpdateUserState}");
 
-
-        await client.SendTextMessageAsync(
-            chatId: telegramUserId,
-            text: result.Text,
-            replyMarkup: result.ReplyMarkup);
+        switch(result)
+        {
+            case PhotoPageResult photoPageResult:
+                await client.SendPhotoAsync(
+                    chatId: telegramUserId,
+                    photo: photoPageResult.Photo,
+                    caption: photoPageResult.Text,
+                    replyMarkup: photoPageResult.ReplyMarkup);
+                break;
+            default:
+                await client.SendTextMessageAsync(
+                    chatId: telegramUserId,
+                    text: result.Text,
+                    replyMarkup: result.ReplyMarkup);
+                break;
+                    
+        }
         storage.AddOrUpdate(telegramUserId, result.UpdateUserState);
-            
-        
-            
-        
     }
 
     private static async Task HandlePoolingError(ITelegramBotClient client, Exception exception, CancellationToken token)

@@ -2,15 +2,15 @@
 
 namespace TelegramBot.User.Pages
 {
-    public class PageResult
+    public class PageResultBase
     {
         public string Text { get; }
 
-        public ReplyMarkupBase ReplyMarkup { get; }
+        public IReplyMarkup ReplyMarkup { get; }
 
         public UserState UpdateUserState { get; set; }
 
-        public PageResult(string text, ReplyMarkupBase replyMarkup)
+        public PageResultBase(string text, IReplyMarkup replyMarkup)
         {
             Text = text;
             ReplyMarkup = replyMarkup;

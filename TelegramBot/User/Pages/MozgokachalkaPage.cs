@@ -5,17 +5,17 @@ namespace TelegramBot.User.Pages
 {
     public class MozgokachalkaPage : IPage
     {
-        public PageResult View(Update update, UserState userState)
+        public PageResultBase View(Update update, UserState userState)
         {
             var text = "Чтобы научиться программировать нужно программировать";
             var replyMarkup = GetReplyMarkup();
-            return new PageResult(text, replyMarkup)
+            return new PageResultBase(text, replyMarkup)
             {
                 UpdateUserState = new UserState(this , userState.UserData)
             };
         }
 
-        public PageResult Handle(Update update, UserState userState)
+        public PageResultBase Handle(Update update, UserState userState)
         {
             throw new NotImplementedException();
         }

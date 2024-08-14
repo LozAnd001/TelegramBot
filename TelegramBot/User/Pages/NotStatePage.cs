@@ -9,12 +9,12 @@ namespace TelegramBot.User.Pages
 {
     public class NotStatePage : IPage
     {
-        public PageResult Handle(Update update, UserState userState)
+        public PageResultBase Handle(Update update, UserState userState)
         {
             return new StartPage().View(update, userState);
         }
 
-        public PageResult View(Update update, UserState userState)
+        public PageResultBase View(Update update, UserState userState)
         {
             return null;
         }

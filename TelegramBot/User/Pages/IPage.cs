@@ -4,9 +4,9 @@ namespace TelegramBot.User.Pages
 {
     public interface IPage
     {
-        PageResult View(Update update, UserState userState);
+        PageResultBase View(Update update, UserState userState);
 
-        PageResult Handle(Update update, UserState userState);
+        PageResultBase Handle(Update update, UserState userState);
 
     }
 

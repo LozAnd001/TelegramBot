@@ -12,11 +12,11 @@ namespace TelegramBot.User.Pages
     {
 
 
-        public PageResult View(Update update, UserState userState)
+        public PageResultBase View(Update update, UserState userState)
         {
             var text = "Приветственный текс";
             ReplyKeyboardMarkup replyMarkup = GetReplyKeyboard();
-            return new PageResult(text, replyMarkup)
+            return new PageResultBase(text, replyMarkup)
             {
                 UpdateUserState = new UserState(this, userState.UserData)
             };
@@ -24,10 +24,10 @@ namespace TelegramBot.User.Pages
 
         
 
-        public PageResult Handle(Update update, UserState userState)
+        public PageResultBase Handle(Update update, UserState userState)
         {
             if (update.Message == null)
-                return new PageResult("Нажмите на кнопки", GetReplyKeyboard());
+                return new PageResultBase("Нажмите на кнопки", GetReplyKeyboard());
             if(update.Message.Text == "МОЗГОКАЧАЛКА")
             {
                 return new MozgokachalkaPage().View(update, userState);
