@@ -5,6 +5,7 @@ using Telegram.Bot.Types.ReplyMarkups;
 using TelegramBot.Storage;
 using TelegramBot.User;
 using TelegramBot.User.Pages;
+using TelegramBot.User.Pages.PageResults;
 
 class Program
 {
@@ -44,6 +45,13 @@ class Program
                     photo: photoPageResult.Photo,
                     caption: photoPageResult.Text,
                     replyMarkup: photoPageResult.ReplyMarkup);
+                break;
+            case VideoPageResult videoPageResult:
+                await client.SendVideoAsync(
+                    chatId: telegramUserId,
+                    video: videoPageResult.Video,
+                    caption: videoPageResult.Text,
+                    replyMarkup: videoPageResult.ReplyMarkup);
                 break;
             default:
                 await client.SendTextMessageAsync(

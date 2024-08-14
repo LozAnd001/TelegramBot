@@ -1,6 +1,6 @@
 ﻿using Telegram.Bot.Types.ReplyMarkups;
 
-namespace TelegramBot.User.Pages
+namespace TelegramBot.User.Pages.PageResults
 {
     public class PageResultBase
     {
@@ -15,6 +15,6 @@ namespace TelegramBot.User.Pages
             Text = text;
             ReplyMarkup = replyMarkup;
         }
-        
+
     }
 }

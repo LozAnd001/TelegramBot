@@ -1,5 +1,6 @@
 ﻿using Telegram.Bot.Types;
 using Telegram.Bot.Types.ReplyMarkups;
+using TelegramBot.User.Pages.PageResults;
 
 namespace TelegramBot.User.Pages
 {
@@ -9,7 +10,8 @@ namespace TelegramBot.User.Pages
         {
             var text = "Чтобы научиться программировать нужно программировать";
             var replyMarkup = GetReplyMarkup();
-            return new PageResultBase(text, replyMarkup)
+            var photoUrl = "https://disk.yandex.ru/i/h1R4Yq-q3-3xSw";
+            return new PhotoPageResult(InputFile.FromUri(photoUrl), text, replyMarkup)
             {
                 UpdateUserState = new UserState(this , userState.UserData)
             };
